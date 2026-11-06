@@ -1,6 +1,6 @@
 # Examen Laravel 13 — Módulo Citas Médicas
 
-Práctica de migración de un módulo de **Laravel 12 a Laravel 13**. Este repositorio contiene el módulo **`citas-medicas`** del proyecto final *Sistema Hospitalario Integrado* (curso Análisis de Sistemas II), portado a un proyecto limpio de Laravel 13 y verificado con pruebas automáticas.
+Práctica de migración de un módulo de **Laravel 12 a Laravel 13**. Este repositorio contiene el módulo **`citas-medicas`** del proyecto final *Sistema Hospitalario Integrado* (curso Análisis de Sistemas II, [repositorio del equipo](https://github.com/compilations-teams/sistema-hospitalario-integrado-SistenasII-2026-G1)), portado a un proyecto limpio de Laravel 13 y verificado con pruebas automáticas.
 
 > Este repositorio es de práctica. El proyecto original (Laravel 12) sigue siendo el del equipo y no se modifica desde aquí.
 
@@ -184,4 +184,19 @@ Prefijo: `/api/v1`. Todas las rutas exigen el encabezado `X-Tenant-ID` con el id
 
 ## Origen
 
-Código tomado del proyecto *Sistema Hospitalario Integrado* (Análisis de Sistemas II, 2026), módulo `citas-medicas`.
+Todo este ejercicio parte del repositorio del equipo, el proyecto final del curso:
+
+**[compilations-teams/sistema-hospitalario-integrado-SistenasII-2026-G1](https://github.com/compilations-teams/sistema-hospitalario-integrado-SistenasII-2026-G1)**
+
+| | |
+|---|---|
+| **Proyecto** | Sistema Hospitalario Integrado |
+| **Organización** | `compilations-teams` |
+| **Grupo** | G1, Análisis de Sistemas II, 2026 |
+| **Versión del framework en el original** | Laravel 12.58 |
+| **Rama y punto de partida** | `main`, hasta el commit `238c9dbb` (merge del PR #571) |
+| **Módulo tomado** | `citas-medicas` |
+
+**Cómo se trajo el código.** Se clonó `main` del repositorio del equipo en una carpeta aparte, `practica-laravel13`, y se reconectó a un repositorio propio. En esa copia el repo del equipo quedó como remoto de solo consulta, llamado `equipo`, y `origin` apunta al repositorio personal. Así se evita publicar por error en el proyecto del equipo. De esa copia se tomó el módulo y se llevó a un proyecto limpio de Laravel 13, que es este repositorio.
+
+El código original es trabajo del equipo. Este repositorio solo documenta la práctica de migración a Laravel 13.
