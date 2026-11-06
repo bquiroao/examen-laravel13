@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Database">
+    <directory>tests/Database</directory>
+</testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="hospital"/>
+        <env name="CENTRAL_DB_HOST" value="127.0.0.1"/>
+        <env name="CENTRAL_DB_PORT" value="55431"/>
+        <env name="CENTRAL_DB_DATABASE" value="his_central_test"/>
+        <env name="CENTRAL_DB_USERNAME" value="postgres"/>
+        <env name="CENTRAL_DB_PASSWORD" value="postgres"/>
+        <env name="HOSPITAL_DB_HOST" value="127.0.0.1"/>
+        <env name="HOSPITAL_DB_PORT" value="55433"/>
+        <env name="HOSPITAL_DB_DATABASE" value="his_hospital_test"/>
+        <env name="HOSPITAL_DB_USERNAME" value="postgres"/>
+        <env name="HOSPITAL_DB_PASSWORD" value="postgres"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+    </php>
+</phpunit>
