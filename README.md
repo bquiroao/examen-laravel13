@@ -1,58 +1,177 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Examen Laravel 13 — Módulo Citas Médicas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Práctica de migración de un módulo de **Laravel 12 a Laravel 13**. Este repositorio contiene el módulo **`citas-medicas`** del proyecto final *Sistema Hospitalario Integrado* (curso Análisis de Sistemas II), portado a un proyecto limpio de Laravel 13 y verificado con pruebas automáticas.
 
-## About Laravel
+> Este repositorio es de práctica. El proyecto original (Laravel 12) sigue siendo el del equipo y no se modifica desde aquí.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Resultado
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Elemento | Estado |
+|---|---|
+| Framework | Laravel **13.40** |
+| Migraciones (2 bases PostgreSQL) | Ejecutan sin cambios |
+| Rutas del módulo | 4 rutas de citas + 6 de autenticación |
+| Pruebas de citas | **6 pasan, 96 aserciones** |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requisitos
 
-## Learning Laravel
+- PHP **8.3 o superior** (Laravel 13 ya no admite 8.2). Probado con PHP 8.4.
+- Composer 2
+- Extensiones de PHP: `pdo_pgsql` y `pgsql`
+- Docker (para PostgreSQL)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Tecnologías
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Laravel 13
+- PostgreSQL 16, con dos bases: `his_central` y `his_hospital`
+- Autenticación JWT con `tymon/jwt-auth` 2.3
+- PHPUnit 12
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Qué incluye el módulo
 
-## Agentic Development
+**Código propio de citas**
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- `app/Http/Controllers/Api/V1/Clinical/AppointmentController.php`
+- `app/Services/Appointments/` (`AppointmentService`, `AvailabilityService`)
+- `app/Http/Resources/AppointmentResource.php`
+- `app/Models/Hospital/Appointment.php`
+- Migración de la tabla `appointments`, en `database/migrations/hospital/`
+- Pruebas: `tests/Feature/Clinical/DoctorAndAppointmentTest.php`
 
-```bash
-composer require laravel/boost --dev
+**Base compartida de la que depende**
 
-php artisan boost:install
+- Modelos centrales y del hospital, `DomainRuleException`, `AuditTrail`, `UserRefSync` y `HospitalDatabase`
+- Middleware `tenant`, `sesion` y `permiso`
+- Login JWT (`AuthController`, `AuthService`) y `PermissionResolver`
+- Seeders de roles, permisos y red de demostración
+- Configuración propia: `config/nido.php`, `config/nido_catalogos.php`, `config/jwt.php`
+
+## Instalación (Windows, PowerShell)
+
+**1. Clonar e instalar dependencias**
+
+```powershell
+git clone https://github.com/bquiroao/examen-laravel13.git
+cd examen-laravel13
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan jwt:secret
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**2. Levantar PostgreSQL con Docker**
 
-## Contributing
+Se usa el puerto **5433** porque el 5432 suele estar ocupado por un PostgreSQL instalado en Windows.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```powershell
+docker run --name pg-examen -e POSTGRES_PASSWORD=postgres -p 5433:5432 -d postgres:16
+docker exec pg-examen psql -U postgres -c "CREATE DATABASE his_central"
+docker exec pg-examen psql -U postgres -c "CREATE DATABASE his_hospital"
+docker exec pg-examen psql -U postgres -d his_hospital -c "CREATE EXTENSION IF NOT EXISTS btree_gist"
+```
 
-## Code of Conduct
+**3. Configurar `.env`**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Reemplaza las líneas `DB_*` por:
 
-## Security Vulnerabilities
+```env
+DB_CONNECTION=hospital
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+CENTRAL_DB_HOST=127.0.0.1
+CENTRAL_DB_PORT=5433
+CENTRAL_DB_DATABASE=his_central
+CENTRAL_DB_USERNAME=postgres
+CENTRAL_DB_PASSWORD=postgres
 
-## License
+HOSPITAL_DB_HOST=127.0.0.1
+HOSPITAL_DB_PORT=5433
+HOSPITAL_DB_DATABASE=his_hospital
+HOSPITAL_DB_USERNAME=postgres
+HOSPITAL_DB_PASSWORD=postgres
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+JWT_TTL=15
+JWT_REFRESH_TTL=20160
+```
+
+Comprueba la conexión:
+
+```powershell
+php artisan db:show --database=central
+php artisan db:show --database=hospital
+```
+
+**4. Migrar**
+
+El orden importa, y son tres comandos porque hay dos bases de datos:
+
+```powershell
+php artisan migrate --database=central --path=database/migrations/central --realpath
+php artisan migrate --database=central --path=database/migrations/framework --realpath
+php artisan migrate --database=hospital --path=database/migrations/hospital --realpath
+```
+
+Resultado esperado: 29 tablas en `his_central` y 30 en `his_hospital`.
+
+## Pruebas
+
+Las pruebas usan bases desechables, distintas de las de desarrollo, porque borran y recrean tablas en cada ejecución:
+
+```powershell
+docker exec pg-examen psql -U postgres -c "CREATE DATABASE his_central_test"
+docker exec pg-examen psql -U postgres -c "CREATE DATABASE his_hospital_test"
+docker exec pg-examen psql -U postgres -d his_hospital_test -c "CREATE EXTENSION IF NOT EXISTS btree_gist"
+```
+
+`phpunit.xml` espera esas bases en los puertos 55431 y 55433. Como aquí están en el 5433, se sobrescriben con variables de entorno antes de correr (valen solo para esa ventana de PowerShell):
+
+```powershell
+$env:CENTRAL_DB_PORT = "5433"
+$env:HOSPITAL_DB_PORT = "5433"
+php artisan test --filter="availability_lists|booking_rules|status_changes|past_confirmed|agenda_lists|doctor_only_sees"
+```
+
+Se ejecutan solo los 6 tests de citas. Los otros 5 de ese archivo prueban médicos y especialidades, un módulo que no se portó.
+
+## Endpoints
+
+Prefijo: `/api/v1`. Todas las rutas exigen el encabezado `X-Tenant-ID` con el identificador del hospital. Las de sesión además piden `Authorization: Bearer <token>`.
+
+| Método | Ruta | Permiso |
+|---|---|---|
+| POST | `/auth/login` | — |
+| GET | `/auth/me` | sesión |
+| GET | `/auth/hospitales` | sesión |
+| POST | `/auth/cambiar-hospital` | sesión |
+| POST | `/auth/refresh` | sesión |
+| POST | `/auth/logout` | sesión |
+| GET | `/disponibilidad` | `citas.ver` |
+| GET | `/citas` | `citas.ver` |
+| POST | `/citas` | `citas.gestionar` |
+| POST | `/citas/{appointment}/estado` | `citas.gestionar` |
+
+## Cambios necesarios de Laravel 12 a 13
+
+- **PHP 8.3 como mínimo.** Laravel 12 pedía 8.2.
+- **PHPUnit 12.** El proyecto original usaba PHPUnit 11.
+- **`routes/api.php` no existe en el esqueleto nuevo.** Hay que crearlo y registrarlo en `bootstrap/app.php` con `api:` y `apiPrefix: 'api/v1'`.
+- **`bootstrap/app.php`** registra los alias de middleware (`tenant`, `sesion`, `permiso`) y el manejo de errores en JSON.
+- **`config/auth.php`:** guard `api` con driver `jwt` y proveedor `users` apuntando a `CentralUser`.
+- **`config/database.php`:** conexiones `central` y `hospital` en PostgreSQL, y `hospital` como conexión por defecto.
+- **`AppServiceProvider`:** registro de `PermissionResolver` y `HospitalDatabase`.
+- **Migraciones por defecto del esqueleto** (usuarios, caché, trabajos) eliminadas: el proyecto usa las de `database/migrations/framework`.
+- **`phpunit.xml` propio**, porque el de Laravel 13 usa SQLite en memoria.
+- **`tymon/jwt-auth` 2.3** declara compatibilidad con Laravel 13 y se instaló sin conflictos.
+
+## Problemas comunes
+
+| Síntoma | Causa y solución |
+|---|---|
+| `password authentication failed for user "postgres"` | Hay otro PostgreSQL en el puerto 5432. Revisa con `netstat -ano \| findstr :5432` y usa el puerto 5433 como en esta guía. |
+| `Class "App\Services\Access\PermissionResolver" not found` | Falta copiar `app/Services/Access`. |
+| `foreach() argument must be of type array\|object, null given` en `RbacCatalogSeeder` | Falta `config/nido.php`. |
+| `Test directory ".../tests/Database" not found` | `phpunit.xml` declara la suite `Database` y la carpeta no existe. Créala o quita la suite del XML. |
+| Error al cargar rutas al arrancar | Falta `routes/api.php`, que `bootstrap/app.php` ya referencia. |
+
+## Origen
+
+Código tomado del proyecto *Sistema Hospitalario Integrado* (Análisis de Sistemas II, 2026), módulo `citas-medicas`.
