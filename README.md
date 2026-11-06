@@ -4,6 +4,16 @@ Práctica de migración de un módulo de **Laravel 12 a Laravel 13**. Este repos
 
 > Este repositorio es de práctica. El proyecto original (Laravel 12) sigue siendo el del equipo y no se modifica desde aquí.
 
+## Datos del estudiante
+
+| | |
+|---|---|
+| **Nombre** | Boris Alexander Quiroa Orellana |
+| **Carné** | 1890-22-1413 |
+| **Carrera** | Ingeniería en Sistemas |
+| **Curso** | Análisis de Sistemas II |
+| **GitHub** | [@bquiroao](https://github.com/bquiroao) |
+
 ## Resultado
 
 | Elemento | Estado |
